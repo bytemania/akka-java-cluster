@@ -18,6 +18,7 @@
         <junit.version>4.13</junit.version>
         <scalatest.version>3.1.1</scalatest.version>
         <logack-classic.version>1.2.3</logack-classic.version>
+        <wurmloch-crdt.version>0.1.0</wurmloch-crdt.version>
     </properties>
 
     <dependencies>
@@ -47,6 +48,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.netopyr.wurmloch</groupId>
+            <artifactId>wurmloch-crdt</artifactId>
+            <version>${wurmloch-crdt.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
