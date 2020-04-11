@@ -43,11 +43,11 @@ class Counter extends AbstractBehavior<CounterProtocol.Command> {
     @Override
     public Receive<CounterProtocol.Command> createReceive() {
         return newReceiveBuilder()
-                .onMessage(CounterProtocol.Increment.class, notUsed -> onIncrement())
+                .onMessageEquals(CounterProtocol.Increment.INSTANCE, this::onIncrement)
                 .onMessage(CounterInternalProtocol.InternalUpdateResponse.class, notUsed -> Behaviors.same())
                 .onMessage(CounterProtocol.GetValue.class, this::onGetValue)
                 .onMessage(CounterProtocol.GetCachedValue.class, this::onGetCachedValue)
-                .onMessage(CounterProtocol.Unsubscribe.class, notUsed -> onUnsubscribe())
+                .onMessageEquals(CounterProtocol.Unsubscribe.INSTANCE, this::onUnsubscribe)
                 .onMessage(CounterInternalProtocol.InternalGetResponse.class, this::onInternalGetResponse)
                 .onMessage(CounterInternalProtocol.InternalSubscribeResponse.class, this::onInternalSubscribeResponse)
                 .build();
