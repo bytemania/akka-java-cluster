@@ -7,29 +7,27 @@ import akka.cluster.ddata.GCounterKey;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.example.akka.java.cluster.util.Util;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class Main {
 
-    private static Behavior<Integer> printer() {
-        return Behaviors.setup(context -> Behaviors.receive(Integer.class).onMessage(Integer.class, i -> {
-            log.info("Received {}", i);
-            return Behaviors.same();
-        }).build());
+    private static ActorSystem<Integer> createPrinter() {
+        Behavior<Integer> behavior = Behaviors.setup(context -> Behaviors.receive(Integer.class)
+                .onMessage(Integer.class, i -> {
+                    log.info("Received {}", i);
+                    return Behaviors.same();
+                }).build());
+
+        Config config = ConfigFactory.parseString("akka.remote.artery.canonical.port=2000").withFallback(ConfigFactory.load());
+        return ActorSystem.create(behavior, "Printer", config);
     }
 
-    private static Random random = new Random();
-
-    private static int randInt(int min, int max) {
-        return random.nextInt((max - min) + 1) + min;
-    }
-
-    private static  ActorSystem<CounterProtocol.Command> createSystem(int port) {
+    private static ActorSystem<CounterProtocol.Command> createSystem(int port) {
         Config config = ConfigFactory.parseString("akka.remote.artery.canonical.port=" + port).withFallback(ConfigFactory.load());
         return ActorSystem.create(Counter.create(GCounterKey.create("GCounterKey")), "ClusterSystem", config);
     }
@@ -50,7 +48,7 @@ public class Main {
 
     private static void setCounters(List<ActorSystem<CounterProtocol.Command>> systems, ActorSystem<Integer> printer) throws InterruptedException {
         for (int i = 0; i < 10; i++) {
-            int index = randInt(0, systems.size() - 1);
+            int index = Util.randInt(0, systems.size() - 1);
             log.info("Sending increment to system: {} - {} - {}", i, index, systems.get(index).address().getPort().get());
             systems.get(index).tell(CounterProtocol.Increment.INSTANCE);
             counterInfo(systems, printer);
@@ -59,8 +57,8 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        Config config = ConfigFactory.parseString("akka.remote.artery.canonical.port=1000").withFallback(ConfigFactory.load());
-        ActorSystem<Integer> printer = ActorSystem.create(Main.printer(), "Printer", config);
+        Config config = ConfigFactory.parseString("akka.remote.artery.canonical.port=2000").withFallback(ConfigFactory.load());
+        ActorSystem<Integer> printer = createPrinter();
         List<ActorSystem<CounterProtocol.Command>> systems = startup(2551, 2552);
         setCounters(systems, printer);
     }
