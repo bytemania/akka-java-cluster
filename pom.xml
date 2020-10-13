@@ -15,7 +15,7 @@
         <lombok.version>1.18.10</lombok.version>
         <scala.version>2.13</scala.version>
         <akka.version>2.6.4</akka.version>
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
         <scalatest.version>3.1.1</scalatest.version>
         <logack-classic.version>1.2.3</logack-classic.version>
         <wurmloch-crdt.version>0.1.0</wurmloch-crdt.version>
